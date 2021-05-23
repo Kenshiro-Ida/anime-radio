@@ -30,6 +30,7 @@ async def on_ready():
 async def join(ctx):
     channel = ctx.message.author.voice.channel
     await channel.connect()
+    await channel.send("Connected to voice")
 
 
 @client.command(pass_context=True, brief="This will play a song 'play [url]'", aliases=['pl'])
@@ -50,8 +51,10 @@ async def play_radio(ctx, url='https://www.youtube.com/watch?v=UoMbwCoJTYM'):
 @client.command(pass_context=True, name='leave', help='Leaves the voice channel')
 async def leave(ctx):
     guild = ctx.message.guild
+    channel = ctx.message.author.voice.channel
     voice_client = guild.voice_client
     await voice_client.disconnect()
+    await channel.send("Left vc")
 
 
 @client.command(pass_context=True, name='setup', help='Is used to Setup bot in the server')
