@@ -28,7 +28,7 @@ async def on_ready():
 
 @client.command(pass_context=True, aliases=['j', 'joi'])
 async def join(ctx):
-    channel = ctx.message.author.voice.channel
+    channel = ctx.voice.channel
     voice = get(client.voice_clients, guild=ctx.guild)
 
     if voice and voice.is_connected():
