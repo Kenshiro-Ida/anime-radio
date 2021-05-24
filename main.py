@@ -13,7 +13,7 @@ players = {}
 @client.event
 async def on_ready():
     await client.change_presence(status=discord.Status.idle)
-    print('Bot Online. h')
+    print('Bot Online.')
 
     while True:
         await client.change_presence(activity=discord.Game("Anime Lo-Fi Music"))
@@ -26,10 +26,43 @@ async def on_ready():
         await asyncio.sleep(20)
 
 
+@client.command(pass_context=True, aliases=['j', 'joi'])
+async def join(ctx):
+    channel = ctx.message.author.voice.channel
+    voice = get(client.voice_clients, guild=ctx.guild)
+
+    if voice and voice.is_connected():
+        await voice.move_to(channel)
+    else:
+        voice = await channel.connect()
+
+    await voice.disconnect()
+
+    if voice and voice.is_connected():
+        await voice.move_to(channel)
+    else:
+        await channel.connect()
+        print(f"The bot has connected to {channel}\n")
+
+    await ctx.send(f"Joined {channel}")
+
+
+@client.command(pass_context=True, aliases=['l', 'lea'])
+async def leave(ctx):
+    channel = ctx.message.author.voice.channel
+    voice = get(client.voice_clients, guild=ctx.guild)
+
+    if voice and voice.is_connected():
+        await voice.disconnect()
+        print(f"The bot has left {channel}")
+        await ctx.send(f"Left {channel}")
+    else:
+        print("Bot was told to leave voice channel, but was not in one")
+        await ctx.send("Don't think I am in a voice channel")
+
+
 @client.command(pass_context=True, brief="This will play a song 'play [url]'", aliases=['pl'])
 async def play_radio(ctx, url='https://www.youtube.com/watch?v=UoMbwCoJTYM'):
-    channel = ctx.author.voice.channel
-    await channel.connect()
     FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
 
     YDL_OPTIONS = {'format': 'bestaudio/best', 'noplaylist': 'True'}
@@ -75,7 +108,8 @@ async def invite(ctx):
         description="Invite For bot",
         color=discord.Colour.blue())
     embed.add_field(name='If you wish to add me in your server,',
-                    value='[Click here to add]( https://discord.com/api/oauth2/authorize?client_id=845348677635145728&permissions=2184185600&scope=bot'
+                    value='[Click here to add]( https://discord.com/api/oauth2/authorize?client_id=845348677635145728'
+                          '&permissions=2184185600&scope=bot '
                           '&permissions=8&scope=bot )',
                     inline=False)
     channel = ctx.message.channel
